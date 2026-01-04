@@ -3,6 +3,7 @@ Compliance Auditor FastAPI Application
 Integrates Neo4j (Graph DB), Qdrant (Vector DB), and Ollama (LLM) for compliance checking
 """
 
+import json
 import logging
 import os
 import re
@@ -500,7 +501,6 @@ async def handle_streaming_response(
                     async for line in response.aiter_lines():
                         if line:
                             try:
-                                import json
                                 chunk = json.loads(line)
                                 if "message" in chunk:
                                     content = chunk["message"].get("content", "")
@@ -538,7 +538,6 @@ async def handle_streaming_response(
                     warning_msg += f"\n\n**Verfügbare Quellen:**\n{source_list}"
                     warning_msg += "\n" + "="*60
                     
-                    import json
                     yield f"data: {json.dumps({
                         'id': f'chatcmpl-{datetime.now().timestamp()}',
                         'object': 'chat.completion.chunk',
@@ -554,7 +553,6 @@ async def handle_streaming_response(
                     logger.info(f"✓ Streaming response contains sources: CELEX={has_celex}, PDF={has_pdf}, REQ={has_req}")
                 
                 # Send final chunk
-                import json
                 yield f"data: {json.dumps({
                     'id': f'chatcmpl-{datetime.now().timestamp()}',
                     'object': 'chat.completion.chunk',
@@ -570,7 +568,6 @@ async def handle_streaming_response(
         
         except Exception as e:
             logger.error(f"❌ Streaming error: {e}", exc_info=True)
-            import json
             yield f"data: {json.dumps({
                 'error': {
                     'message': str(e),
